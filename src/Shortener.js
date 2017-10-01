@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import {Jumbotron, Grid, FormControl, FormGroup, Button, InputGroup, Panel } from 'react-bootstrap';
-
-
 
 class MagicShorteningPanel extends Component {
 
