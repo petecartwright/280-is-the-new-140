@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-
+import './animate.min.css';
 import Shortener from './Shortener';
 
 class App extends Component {
@@ -9,8 +9,7 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">280 is the new 140</h1>
+          <h1>280 is the new 140</h1>
         </header>
 
         <Shortener />
