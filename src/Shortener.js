@@ -1,18 +1,78 @@
 import React, { Component } from 'react';
-import {Jumbotron, Grid, Form, FormControl, FormGroup, Button, InputGroup, Panel } from 'react-bootstrap';
+import ReactDOM from 'react-dom';
+import {Jumbotron, Grid, FormControl, FormGroup, Button, InputGroup, Panel } from 'react-bootstrap';
 
-const proprietary_shortening_algorithm = function(input_string){
 
-    let length_of_string = input_string.length;
-    var output_string = '';
 
-    for (let i = 0; i < length_of_string; i++){
-      if (i%2 === 0){
-        output_string += input_string[i];
+class MagicShorteningPanel extends Component {
+
+
+    // this.setState({ isLoading: true }); 
+    // this.setLoadingTimer(); // pretend this is taking any time at all
+
+    // setLoadingTimer(){
+
+    //   let time_to_wait = 750; // 3/4 second
+
+    //   setTimeout(function(){
+    //       this.setState( { isLoading: false });
+    //   }.bind(this), time_to_wait);
+
+    // }
+
+    // // if we're pretending to be loading, show the 'loading' text
+    // if (isLoading) {
+
+    //   panel = <Panel> 
+    //               <p>Generating shorter tweet with proprietary algorithm, please wait...</p>
+    //           </Panel>
+    // // if we've just submitted a new string, display the lil shortening animation, 
+    // // then 
+    // } else if (justSubmitted) {
+    //   panel = <Panel> </Panel>
+    // // otherwise just display an empty panel
+    // } else {
+    //   panel = <Panel> </Panel> 
+    // }
+
+  componentDidUpdate(prevProps, prevState){
+
+    // wait a second for ppl to be able to read the text
+    // then apply the animate out CSS tags and let animate.css take them
+    // then remove the elements from the DOM altogether
+    setTimeout(function(){
+        const chars_to_remove = document.querySelectorAll("span.character-to-remove");
+        chars_to_remove.forEach(function(elem){ elem.className = 'animated flipOutX'; });
+        setTimeout(function(){
+           chars_to_remove.forEach(function(elem){ elem.remove() }); 
+        },1000);
+      },1500);
+
+  }
+
+  render() {  
+      console.log('in MagicShorteningPanel render')
+      console.log('props are ')
+      console.log(this.props)
+      let initial_text = this.props.initial_text;
+      let output_spans = [];
+
+      for (let index in initial_text ) {
+        if (index%2 === 0 ){
+          output_spans.push(<span key={index} className='character-to-remove'>{initial_text[index]}</span>)
+        } else {
+          output_spans.push(<span key={index} >{initial_text[index]}</span>)
+        }
       }
-    }
-    return output_string
-  };  
+
+    return(
+      <Panel>
+        <p>{output_spans}</p>
+      </Panel>
+    )
+  }
+}
+
 
 
 class Shortener extends Component {
@@ -20,30 +80,13 @@ class Shortener extends Component {
   constructor(props) {
     super(props);
     this.state = { 
-                   input_string: '',
-                   output_string: '',
-                   isLoading: false
+                   input_string: '',    // updates every keystroke
+                   text_to_shorten: ''  // only will update this when Submit is hit
                  };
+
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.setLoadingTimer = this.setLoadingTimer.bind(this);
    }
-
-
-  setLoadingTimer(){
-    // create a timer for a random 1-4 second period to load
-    let min_time = 1000;  // one second
-    let max_time = 2000;  // 4 seconds
-    let time_to_wait = Math.random() * (max_time - min_time) + min_time;
-    console.log('setting timer for ' + time_to_wait.toString()); 
-    setTimeout(function(){
-        console.log('in timeout function');
-        console.log('isLoading is ')
-        this.setState( { isLoading: false });
-    }.bind(this), time_to_wait);
-    console.log('past timeout function');
-  }
-
 
   handleInputChange(e){
     this.setState({ input_string: e.target.value});
@@ -51,26 +94,12 @@ class Shortener extends Component {
 
   handleSubmit(e){
     e.preventDefault(); // don't reload the page
-    this.setState({ isLoading: true });
-    this.setLoadingTimer();
-    // then actually set the new 
-    var new_output_string = proprietary_shortening_algorithm(this.state.input_string);
-    this.setState({ output_string: new_output_string });
-    
+    this.setState({ text_to_shorten: this.state.input_string });
   }
 
-  
-
   render() {
-
-    let isLoading = this.state.isLoading;
-    let panel = null;
-    if (isLoading) {
-      panel = <Panel> Generating shortened tweet with proprietary algorithm, please wait... </Panel>
-    } else {
-      panel = <Panel> {this.state.output_string}</Panel>
-    }
-
+    console.log('Rendering Shortener, state is');
+    console.log(this.state);
     return (
       <div className="shortener">
         <Grid style={ {paddingTop: '5%'} }>
@@ -89,12 +118,12 @@ class Shortener extends Component {
                     onChange={this.handleInputChange}
                 />
                 <InputGroup.Button>
-                  <Button bsStyle="primary" type="submit"> Shorten </Button>
+                  <Button  type="submit"> Shorten </Button>
                 </InputGroup.Button>
                 </InputGroup>
               </FormGroup>
             </form>
-            {panel}
+            <MagicShorteningPanel initial_text={this.state.text_to_shorten}  />
           </Jumbotron>
         </Grid>
       </div>
