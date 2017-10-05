@@ -1,67 +1,100 @@
 import React, { Component } from 'react';
 import {Jumbotron, Grid, FormControl, FormGroup, Button, InputGroup, Panel } from 'react-bootstrap';
 
+
+
+
+
 class MagicShorteningPanel extends Component {
 
+  constructor(props){
+    super(props);
+    this.state = { 
+                    initial_text: '',
+                    final_text: '',
+                    loading: false,
+                    animating_text: false,
+                    done_animating: false
+                  }
+    this.handleLoadingAnimation = this.handleLoadingAnimation.bind(this);
+    this.handleTextAnimation = this.handleTextAnimation.bind(this);
+    /**             }
+     * the states this component can be in:
+     * 
+     * Blank/Default: this.props.initial_text = ''
+     * Loading: loading === true // show the loading text
+     * Text Animating: animating_text === true // text has been loading and is being animated
+     * Shortened: final_text !== '', loading === false, animating_text === false. text is stable and final text should be copyable
+    */
+  }
 
-    // this.setState({ isLoading: true }); 
-    // this.setLoadingTimer(); // pretend this is taking any time at all
+  handleTextAnimation(){
+    // give the text animation a second to run
+    // then turn off that flag and set the final text to what we want to display
+    let final_text = '';
+    let initial_text = this.props.initial_text;
+    for (let index in initial_text) {
+      if (index%2 === 0 ){
+        final_text += initial_text[index];
+      }
+    }
 
-    // setLoadingTimer(){
+    setTimeout(
+      function(){
+        this.setState({animating_text: false, final_text: final_text });
+      }.bind(this),
+      1000
+    );
+  }
 
-    //   let time_to_wait = 750; // 3/4 second
+  handleLoadingAnimation(){
+    // give the 'loading' text a second to display, then call handleTextAnimation to actually animate the text
+    setTimeout(
+        function(){
+            // after a second, 
+            this.setState({loading: false, animating_text: true});
+            this.handleTextAnimation();
+          }.bind(this), 
+          1000);
+  }
 
-    //   setTimeout(function(){
-    //       this.setState( { isLoading: false });
-    //   }.bind(this), time_to_wait);
-
-    // }
-
-    // // if we're pretending to be loading, show the 'loading' text
-    // if (isLoading) {
-
-    //   panel = <Panel> 
-    //               <p>Generating shorter tweet with proprietary algorithm, please wait...</p>
-    //           </Panel>
-    // // if we've just submitted a new string, display the lil shortening animation, 
-    // // then 
-    // } else if (justSubmitted) {
-    //   panel = <Panel> </Panel>
-    // // otherwise just display an empty panel
-    // } else {
-    //   panel = <Panel> </Panel> 
-    // }
-
-  componentDidUpdate(prevProps, prevState){
-
-    // wait a second for ppl to be able to read the text
-    // then apply the animate out CSS tags and let animate.css take them
-    // then remove the elements from the DOM altogether
-    setTimeout(function(){
-        const chars_to_remove = document.querySelectorAll("span.character-to-remove");
-        chars_to_remove.forEach(function(elem){ elem.className = 'animated flipOutX'; });
-        setTimeout(function(){
-           chars_to_remove.forEach(function(elem){ elem.remove() }); 
-        },1000);
-      },1500);
-
+  componentWillReceiveProps(nextProps){
+    // only start our updates if we get new initial text
+    if (this.state.initial_text !== nextProps.initial_text) {
+      this.setState({ initial_text: nextProps.initial_text,
+                      loading: true
+                      })
+      // then hand it off to the Loading... text
+      this.handleLoadingAnimation();
+    }
   }
 
   render() {  
-      console.log('in MagicShorteningPanel render')
-      console.log('props are ')
-      console.log(this.props)
-      let initial_text = this.props.initial_text;
-      let output_spans = [];
 
+    let initial_text = this.props.initial_text;
+    let output_spans = [];
+
+    if (this.props.initial_text === '' ){
+      output_spans.push(<span key='1'></span>)
+
+    } else if (this.state.loading) {
+      output_spans.push(<span key='1'>Running proprietary algorithm...</span>)
+
+    } else if (this.state.animating_text) {
       for (let index in initial_text ) {
-        if (index%2 === 0 ){
-          output_spans.push(<span key={index} className='character-to-remove'>{initial_text[index]}</span>)
+        let key = Math.random();
+        if (index%2 === 1 ){
+          output_spans.push(<span key={key} className='character-to-remove animated flipOutX'>{initial_text[index]}</span>)
         } else {
-          output_spans.push(<span key={index} >{initial_text[index]}</span>)
+          output_spans.push(<span key={key} >{initial_text[index]}</span>)
         }
       }
+    } else {
+      output_spans.push(<span key='1'> {this.state.final_text} </span>)      
+    }
 
+
+    
     return(
       <Panel>
         <p>{output_spans}</p>
@@ -94,9 +127,11 @@ class Shortener extends Component {
     this.setState({ text_to_shorten: this.state.input_string });
   }
 
+
+
   render() {
-    console.log('Rendering Shortener, state is');
-    console.log(this.state);
+    // console.log('Rendering Shortener, state is');
+    // console.log(this.state);
     return (
       <div className="shortener">
         <Grid style={ {paddingTop: '5%'} }>
