@@ -2,7 +2,7 @@
   "name": "tweet_shortener",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://myusername.github.io/my-app",
+  "homepage": "https://petecartrwight.github.io/280-is-the-new-140",
 
   "dependencies": {
     "react": "^16.0.0",
