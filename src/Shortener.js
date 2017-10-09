@@ -3,8 +3,6 @@ import {Jumbotron, Grid, FormControl, FormGroup, Button, InputGroup, Panel } fro
 
 
 
-
-
 class MagicShorteningPanel extends Component {
 
   constructor(props){
