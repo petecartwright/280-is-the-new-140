@@ -156,6 +156,7 @@ class Shortener extends Component {
             <MagicShorteningPanel initial_text={this.state.text_to_shorten}  />
           </Jumbotron>
         </Grid>
+        v2
       </div>
     );
   }
